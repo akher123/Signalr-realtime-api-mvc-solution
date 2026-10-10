@@ -88,6 +88,7 @@ public sealed class ApprovalService : IApprovalService
 
         var dto = ToDto(request, request.Requester.DisplayName);
         await _notifier.PushToUserAsync(request.RequesterId, ApprovalEvents.Decided, dto, cancellationToken);
+        await _notifier.PushToRoleAsync(AppRoles.Approver, ApprovalEvents.Decided, dto, cancellationToken);
         return new DecideResult(DecideOutcome.Updated, dto);
     }
 

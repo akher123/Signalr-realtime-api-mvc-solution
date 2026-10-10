@@ -64,6 +64,32 @@ public sealed class ApprovalsController : Controller
     }
 
     [HttpGet]
+    public async Task<IActionResult> Alerts(CancellationToken cancellationToken)
+    {
+        var token = Token();
+        var roles = HttpContext.Session.GetString(SessionKeys.Roles) ?? "";
+        var isApprover = roles.Split(',', StringSplitOptions.RemoveEmptyEntries).Contains(SessionKeys.Approver);
+        if (token is null || !isApprover)
+        {
+            return Unauthorized();
+        }
+
+        var result = await _api.GetPendingAsync(token, cancellationToken);
+        if (result.StatusCode == StatusCodes.Status401Unauthorized)
+        {
+            HttpContext.Session.Clear();
+            return Unauthorized();
+        }
+
+        if (!result.Succeeded)
+        {
+            return StatusCode(result.StatusCode);
+        }
+
+        return Json(result.Value ?? []);
+    }
+
+    [HttpGet]
     public async Task<IActionResult> Inbox(CancellationToken cancellationToken)
     {
         if (RequireRole(SessionKeys.Approver) is { } redirect)

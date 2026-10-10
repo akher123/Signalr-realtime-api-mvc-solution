@@ -29,3 +29,27 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+.alert-bell {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.alert-bell .badge {
+  top: 0.35rem;
+  left: auto;
+  right: 0.15rem;
+  font-size: 0.65rem;
+}
+
+.alert-menu {
+  width: 20rem;
+  max-width: calc(100vw - 2rem);
+}
+
+.alert-item {
+  white-space: normal;
+}
