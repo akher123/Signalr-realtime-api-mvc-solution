@@ -1,0 +1,70 @@
+@model IReadOnlyList<ApprovalItem>
+@{
+    ViewData["Title"] = "My requests";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">My requests</h1>
+    <span id="live-status" class="text-muted">Connecting</span>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h2 class="h5">New request</h2>
+        <form asp-action="Create" method="post">
+            <div class="mb-3">
+                <label class="form-label" for="Title">Title</label>
+                <input class="form-control" id="Title" name="Title" maxlength="200" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="Details">Details</label>
+                <textarea class="form-control" id="Details" name="Details" maxlength="2000" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit for approval</button>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Details</th>
+                <th>Status</th>
+                <th>Note</th>
+                <th>Submitted</th>
+            </tr>
+        </thead>
+        <tbody id="request-rows">
+            @if (Model.Count == 0)
+            {
+                <tr id="empty-state"><td colspan="5" class="text-muted">No requests yet.</td></tr>
+            }
+            @foreach (var item in Model)
+            {
+                <tr data-request-id="@item.Id">
+                    <td>@item.Title</td>
+                    <td>@item.Details</td>
+                    <td><span class="badge status @StatusBadge(item.Status)">@item.Status</span></td>
+                    <td class="note">@(item.DecisionNote ?? "—")</td>
+                    <td>@item.CreatedAt.ToLocalTime().ToString("g")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@functions {
+    private static string StatusBadge(string status) => status switch
+    {
+        "Approved" => "text-bg-success",
+        "Rejected" => "text-bg-danger",
+        _ => "text-bg-warning"
+    };
+}
+
+@section Scripts {
+    <script src="~/lib/signalr/signalr.min.js"></script>
+    <script src="~/js/approvals.js" asp-append-version="true"></script>
+}

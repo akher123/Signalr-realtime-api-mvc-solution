@@ -1,0 +1,101 @@
+﻿@using Microsoft.AspNetCore.Antiforgery
+@inject IAntiforgery Antiforgery
+@inject IConfiguration Configuration
+@{
+    var tokens = Antiforgery.GetAndStoreTokens(Context);
+    var roleList = (Context.Session.GetString(SessionKeys.Roles) ?? "")
+        .Split(',', StringSplitOptions.RemoveEmptyEntries);
+    var displayName = Context.Session.GetString(SessionKeys.DisplayName);
+    var accessToken = Context.Session.GetString(SessionKeys.Token);
+    var isRequester = roleList.Contains(SessionKeys.Requester);
+    var isApprover = roleList.Contains(SessionKeys.Approver);
+    var signalRPage = ViewData["SignalRPage"] as string;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content="@tokens.RequestToken" />
+    <title>@ViewData["Title"] - Approval sample</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/SignalR.Mvc.styles.css" asp-append-version="true" />
+</head>
+<body data-access-token="@accessToken"
+      data-hub-url="@Configuration["Api:HubUrl"]"
+      data-page="@signalRPage"
+      data-decide-url="@Url.Action("Decide", "Approvals")">
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">Approvals</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        @if (isRequester)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Approvals" asp-action="Mine">My requests</a>
+                            </li>
+                        }
+                        @if (isApprover)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Approvals" asp-action="Inbox">Inbox</a>
+                            </li>
+                        }
+                    </ul>
+                    <ul class="navbar-nav">
+                        @if (displayName is null)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Sign in</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item d-flex align-items-center text-muted me-2">@displayName</li>
+                            <li class="nav-item">
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-link nav-link text-dark">Sign out</button>
+                                </form>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @if (TempData["Error"] is string error)
+            {
+                <div class="alert alert-danger">@error</div>
+            }
+            @if (TempData["Message"] is string message)
+            {
+                <div class="alert alert-success">@message</div>
+            }
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2026 - Approval sample
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

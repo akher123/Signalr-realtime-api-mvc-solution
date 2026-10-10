@@ -1,0 +1,17 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <h1 class="mb-3">Approval notifications</h1>
+        <p class="lead">A requester submits work for approval. Approvers see it immediately, and the requester sees the decision without refreshing.</p>
+        <ol>
+            <li>Sign in as <strong>requester</strong> and submit a request.</li>
+            <li>Sign in as <strong>approver</strong> in another browser. The inbox updates live.</li>
+            <li>Approve or reject. The requester's list updates live.</li>
+        </ol>
+        <p>Both demo accounts use the password <code>Password123!</code>.</p>
+        <a class="btn btn-primary" asp-controller="Account" asp-action="Login">Sign in</a>
+    </div>
+</div>

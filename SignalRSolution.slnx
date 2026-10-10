@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="SignalR.Api/SignalR.Api.csproj" Id="3eb2e3a4-bd1b-42cb-a824-97c9b9381a37" />
+  <Project Path="SignalR.BLL/SignalR.BLL.csproj" Id="3c1001fc-cb24-495f-a21e-dd7966def4eb" />
+  <Project Path="SignalR.DAL/SignalR.DAL.csproj" Id="45ba5218-7afc-48d7-80a3-aa6292b2c2e0" />
+  <Project Path="SignalR.Mvc/SignalR.Mvc.csproj" Id="a080ee70-00a6-4905-b629-89c3029c72f0" />
+</Solution>

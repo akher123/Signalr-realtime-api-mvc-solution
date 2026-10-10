@@ -1,0 +1,51 @@
+@model IReadOnlyList<ApprovalItem>
+@{
+    ViewData["Title"] = "Inbox";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Approver inbox</h1>
+    <span id="live-status" class="text-muted">Connecting</span>
+</div>
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Requester</th>
+                <th>Details</th>
+                <th>Submitted</th>
+                <th>Decision</th>
+            </tr>
+        </thead>
+        <tbody id="request-rows">
+            @if (Model.Count == 0)
+            {
+                <tr id="empty-state"><td colspan="5" class="text-muted">No pending requests.</td></tr>
+            }
+            @foreach (var item in Model)
+            {
+                <tr data-request-id="@item.Id">
+                    <td class="title">@item.Title</td>
+                    <td class="requester">@item.RequesterName</td>
+                    <td class="details">@item.Details</td>
+                    <td class="submitted">@item.CreatedAt.ToLocalTime().ToString("g")</td>
+                    <td>
+                        <form asp-action="Decide" method="post" class="d-flex gap-2">
+                            <input type="hidden" name="Id" value="@item.Id" />
+                            <input class="form-control form-control-sm" name="Note" maxlength="1000" placeholder="Note" />
+                            <button class="btn btn-sm btn-success" name="Approved" value="true" type="submit">Approve</button>
+                            <button class="btn btn-sm btn-outline-danger" name="Approved" value="false" type="submit">Reject</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="~/lib/signalr/signalr.min.js"></script>
+    <script src="~/js/approvals.js" asp-append-version="true"></script>
+}
